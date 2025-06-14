@@ -43,7 +43,7 @@
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
                 const text = file.text();
-                const newGame = convertSave(e.target.result);
+                const newGame = convertSave(text);
                 outputText.value = newGame;
             } else if (textInput.trim() !== '') {
                 const newGame = convertSave(textInput);
