@@ -24,13 +24,13 @@
     <div class="input-group">
         <label for="outputText">Output:</label>
         <textarea id="outputText" readonly placeholder="Output will appear here..."></textarea>
-        <button id="copyBtn" type="button">Copy</button>
     </div>
+    <button id="copyBtn" type="button">Copy</button>
     
     <script>
         function convertSave(input) {
             const lines = input.split('\n');
-            const [, rows, cols] = /:(\d)+x(\d)+/.exec(lines.find(line => line.startsWith('PARAMS')));
+            const [, rows, cols] = /:(\d+)x(\d+)/.exec(lines.find(line => line.startsWith('PARAMS')));
             const [, cells] = /:\d+:([a-z0-9]+)/.exec(lines.find(line => line.startsWith('DESC'))) || [];
             const newCells = cells.replace(/[a-z]/g, c => '.'.repeat(c.charCodeAt(0) - 'a'.charCodeAt(0) + 1));
             return `${rows}x${cols} ${newCells}`;
