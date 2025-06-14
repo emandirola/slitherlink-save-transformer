@@ -42,12 +42,9 @@
             const outputText = document.getElementById('outputText');
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const newGame = convertSave(e.target.result);
-                    outputText.value = newGame;
-                };
-                reader.readAsText(file);
+                const text = file.text();
+                const newGame = convertSave(e.target.result);
+                outputText.value = newGame;
             } else if (textInput.trim() !== '') {
                 const newGame = convertSave(textInput);
                 outputText.value = newGame;
