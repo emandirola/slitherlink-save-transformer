@@ -36,13 +36,13 @@
             return `${rows}x${cols} ${newCells}`;
         }
 
-        document.getElementById('submitBtn').onclick = function() {
+        document.getElementById('submitBtn').onclick = async function() {
             const fileInput = document.getElementById('fileInput');
             const textInput = document.getElementById('textInput').value;
             const outputText = document.getElementById('outputText');
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
-                const text = file.text();
+                const text = await file.text();
                 const newGame = convertSave(text);
                 outputText.value = newGame;
             } else if (textInput.trim() !== '') {
