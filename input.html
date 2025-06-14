@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slitherlink save game converter</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        .input-group { margin-bottom: 1em; margin-top: 1em; }
+        textarea { width: 100%; height: 100px; }
+    </style>
+</head>
+<body>
+    <h1>Input File or Text</h1>
+    <div class="input-group">
+        <label for="fileInput">Choose a file:</label>
+        <input type="file" id="fileInput">
+    </div>
+    <div class="input-group">
+        <label for="textInput">Or enter text:</label>
+        <textarea id="textInput" placeholder="Paste or type your text here..."></textarea>
+    </div>
+    <button id="submitBtn">Submit</button>
+    <div class="input-group">
+        <label for="outputText">Output:</label>
+        <textarea id="outputText" readonly placeholder="Output will appear here..."></textarea>
+        <button id="copyBtn" type="button">Copy</button>
+    </div>
+    
+    <script>
+        function convertSave(input) {
+            const lines = input.split('\n');
+            const [, rows, cols] = /:(\d)+x(\d)+/.exec(lines.find(line => line.startsWith('PARAMS')));
+            const [, cells] = /:\d+:([a-z0-9]+)/.exec(lines.find(line => line.startsWith('DESC'))) || [];
+            const newCells = cells.replace(/[a-z]/g, c => '.'.repeat(c.charCodeAt(0) - 'a'.charCodeAt(0) + 1));
+            return `${rows}x${cols} ${newCells}`;
+        }
+
+        document.getElementById('submitBtn').onclick = function() {
+            const fileInput = document.getElementById('fileInput');
+            const textInput = document.getElementById('textInput').value;
+            const outputText = document.getElementById('outputText');
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const newGame = convertSave(e.target.result);
+                    outputText.value = newGame;
+                };
+                reader.readAsText(file);
+            } else if (textInput.trim() !== '') {
+                const newGame = convertSave(textInput);
+                outputText.value = newGame;
+            } else {
+                alert('Please select a file or enter some text.');
+            }
+        };
+        document.getElementById('copyBtn').onclick = function() {
+            const outputText = document.getElementById('outputText');
+            outputText.select();
+            document.execCommand('copy');
+        };
+    </script>
+</body>
+</html>
