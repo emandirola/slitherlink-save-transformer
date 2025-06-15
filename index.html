@@ -30,16 +30,26 @@
     <script>
         function convertSave(input) {
             const lines = input.split('\n');
-            const [, rows, cols] = /:(\d+)x(\d+)/.exec(lines.find(line => line.startsWith('PARAMS')));
-            const [, cells] = /:\d+:([a-z0-9]+)/.exec(lines.find(line => line.startsWith('DESC'))) || [];
-            const newCells = cells.replace(/[a-z]/g, c => '.'.repeat(c.charCodeAt(0) - 'a'.charCodeAt(0) + 1));
-            return `${rows}x${cols} ${newCells}`;
+            const game = readAttribute(lines, 'GAME');
+            if (game.toLowerCase() !== 'loopy') {
+                throw new Error(`Not a Loopy save game file, found "${game}"`);
+            }
+            const [, rows, cols] = readAttribute(lines, 'PARAMS').match(/(\d+)x(\d+)/);
+            const board = readAttribute(lines, 'DESC');
+            const cells = board.replace(/[a-z]/g, c => '.'.repeat(c.charCodeAt(0) - 'a'.charCodeAt(0) + 1));
+            return `${rows}x${cols} ${cells}`;
+        }
+
+        /** @return {string} */
+        function readAttribute(lines, attr) {
+            const line = lines.find(line => line.toLowerCase().startsWith(attr.toLowerCase()));
+            return line.split(':')[2];
         }
 
         fileInput.onchange = async () => {
             const file = fileInput.files[0];
-            if (!/loopy.*sgtp/i.test(file.name)) {
-                outputText.innerHTML = 'Please select a valid Slitherlink save game file (Loopy.sgtp)';
+            if (!/\.sgtp/i.test(file.name)) {
+                outputText.innerHTML = 'Please select a valid save game (*.sgtp)';
                 fileInput.value = '';
                 return;
             }
