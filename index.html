@@ -11,21 +11,21 @@
     </style>
 </head>
 <body>
-    <h1>Input File or Text</h1>
+    <h1>Slitherlink save transformer</h1>
     <div class="input-group">
-        <label for="fileInput">Choose a file:</label>
+        <label for="fileInput">Choose a file (Loopy.sgtp):</label>
         <input type="file" id="fileInput" accept="text/*,application/octet-stream">
     </div>
+    <!--
     <div class="input-group">
         <label for="textInput">Or enter text:</label>
         <textarea id="textInput" placeholder="Paste or type your text here..."></textarea>
-    </div>
+    </div> 
     <button id="submitBtn">Submit</button>
+    -->
     <div class="input-group">
-        <label for="outputText">Output:</label>
-        <textarea id="outputText" readonly placeholder="Output will appear here..."></textarea>
+        <div id="outputText"></div>
     </div>
-    <button id="copyBtn" type="button">Copy</button>
     
     <script>
         function convertSave(input) {
@@ -36,27 +36,23 @@
             return `${rows}x${cols} ${newCells}`;
         }
 
-        document.getElementById('submitBtn').onclick = async function() {
-            const fileInput = document.getElementById('fileInput');
-            const textInput = document.getElementById('textInput').value;
-            const outputText = document.getElementById('outputText');
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const text = await file.text();
-                const newGame = convertSave(text);
-                outputText.value = newGame;
-            } else if (textInput.trim() !== '') {
-                const newGame = convertSave(textInput);
-                outputText.value = newGame;
-            } else {
-                alert('Please select a file or enter some text.');
+        fileInput.onchange = async () => {
+            const file = fileInput.files[0];
+            if (!/loopy.*sgtp/i.test(file.name)) {
+                outputText.innerHTML = 'Please select a valid Slitherlink save game file (Loopy.sgtp)';
+                fileInput.value = '';
+                return;
             }
-        };
-        document.getElementById('copyBtn').onclick = function() {
-            const outputText = document.getElementById('outputText');
-            outputText.select();
-            document.execCommand('copy');
-        };
+            const text = await file.text();
+            try {
+                const newGame = convertSave(text);
+                await navigator.clipboard.writeText(newGame);
+                outputText.innerHTML = 'Converted and copied to clipboard:<br><pre>' + newGame + '</pre>';
+            } catch (e) {
+                outputText.innerHTML = 'Error processing file: ' + e.message;
+                fileInput.value = '';
+            }
+        }
     </script>
 </body>
 </html>
